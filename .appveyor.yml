@@ -30,13 +30,14 @@ environment:
 # Required softwares for building
 install:
   # Download required packages
-  - cmd: if defined BUILD_DIR ( %PYTHON%\python.exe -m pip install meson && COPY %PYTHON%\Scripts\meson.py meson.py )
+  - cmd: set PATH=%cd%;C:\ninja-build;%PYTHON_ROOT%;%PYTHON_ROOT%\Scripts;%PATH%
+  - cmd: if defined BUILD_DIR ( %PYTHON%\python.exe -m pip install meson )
   - cmd: if defined NINJA_URL ( powershell -Command wget %NINJA_URL% -OutFile ninja.zip && unzip ninja.zip )
 
 # Build scripts
 build_script:
-  - cmd: if %builder% == msvc_ninja_64 ( call "%VSVARSALLPATH%" x64 && %PYTHON%\\python.exe meson.py build && ninja -C build )
-  - cmd: if %builder% == msvc_ninja_32 ( call "%VSVARSALLPATH%" x86 && %PYTHON%\\python.exe meson.py build && ninja -C build )
+  - cmd: if %builder% == msvc_ninja_64 ( call "%VSVARSALLPATH%" x64 && meson build && ninja -C build )
+  - cmd: if %builder% == msvc_ninja_32 ( call "%VSVARSALLPATH%" x86 && meson build && ninja -C build )
 
 ## Artifacts
 #artifacts:
