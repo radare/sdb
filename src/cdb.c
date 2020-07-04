@@ -1,12 +1,7 @@
 /* Public domain - author D. J. Bernstein, modified by pancake - 2014-2016 */
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "cdb.h"
-#if USE_MMAN
-#include <sys/mman.h>
-#endif
+#include <sys/stat.h>
 
 /* XXX: this code must be rewritten . too slow */
 bool cdb_getkvlen(struct cdb *c, ut32 *klen, ut32 *vlen, ut32 pos) {

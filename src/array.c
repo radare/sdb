@@ -481,8 +481,9 @@ SDB_API int sdb_array_delete(Sdb *s, const char *key, int idx, ut32 cas) {
 	if (n) {
 		memmove (p, n + 1, strlen (n));
 	} else {
-		if (p != str)
+		if (p != str) {
 			p--; // remove tailing SDB_RS
+		}
 		*p = 0;
 		p[1] = 0;
 	}
@@ -504,16 +505,12 @@ SDB_API bool sdb_array_contains(Sdb *s, const char *key, const char *val, ut32 *
 	const char *next, *ptr = sdb_const_get (s, key, cas);
 	if (ptr && *ptr) {
 		size_t vlen = strlen (val);
-		while (1) {
+		for (next = ptr; next; ptr = next + 1) {
 			next = strchr (ptr, SDB_RS);
 			size_t len = next ? (size_t)(next - ptr) : strlen (ptr);
 			if (len == vlen && !memcmp (ptr, val, len)) {
 				return true;
 			}
-			if (!next) {
-				break;
-			}
-			ptr = next + 1;
 		}
 	}
 	return false;

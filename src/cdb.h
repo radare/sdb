@@ -3,8 +3,10 @@
 #ifndef CDB_H
 #define CDB_H
 
-#include <string.h>
 #include "types.h"
+#if USE_MMAN
+#include <sys/mman.h>
+#endif
 
 #define KVLSZ 4
 #define CDB_MAX_KEY 0xff
