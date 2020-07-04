@@ -9,12 +9,12 @@ int main() {
 	sdb_array_delete (s, "array", 1, 0);
 	cp = sdb_const_get (s, "array", 0);
 	printf ("--> %s\n", cp);
-	printf ("--> %d\n", sdb_array_length (s, "array"));
+	printf ("--> %zd\n", sdb_array_length (s, "array"));
 	sdb_array_push (s, "array", "end", 0);
 	sdb_array_push (s, "array", "end2", 0);
 	cp = sdb_const_get (s, "array", 0);
 	printf ("--> %s\n", cp);
-	printf ("--> %d\n", sdb_array_length (s, "array"));
+	printf ("--> %zd\n", sdb_array_length (s, "array"));
 	sdb_array_push (s, "array", "end2", 0);
 
 	printf ("--> POP <--\n");

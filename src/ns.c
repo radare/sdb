@@ -13,22 +13,23 @@ SDB_API void sdb_ns_lock(Sdb *s, int lock, int depth) {
 	}
 }
 
-static int in_list(SdbList *list, void *item) {
+static bool in_list(SdbList *list, void *item) {
 	SdbNs *ns;
 	SdbListIter *it;
-	if (list && item)
-	ls_foreach (list, it, ns) {
-		if (item == ns) {
-			return 1;
+	if (list && item) {
+		ls_foreach (list, it, ns) {
+			if (item == ns) {
+				return true;
+			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 static void ns_free(Sdb *s, SdbList *list) {
 	SdbListIter next;
 	SdbListIter *it;
-	int deleted;
+	bool deleted;
 	SdbNs *ns;
 	if (!list || !s) {
 		return;
@@ -39,13 +40,13 @@ static void ns_free(Sdb *s, SdbList *list) {
 	}
 	ls_append (list, s);
 	ls_foreach (s->ns, it, ns) {
-		deleted = 0;
+		deleted = false;
 		next.n = it->n;
 		if (!in_list (list, ns)) {
 			ls_delete (s->ns, it); // free (it)
 			free (ns->name);
 			ns->name = NULL;
-			deleted = 1;
+			deleted = true;
 			if (ns->sdb) {
 				if (sdb_free (ns->sdb)) {
 					ns->sdb = NULL;
@@ -144,26 +145,26 @@ SDB_API bool sdb_ns_unset (Sdb *s, const char *name, Sdb *r) {
 	return false;
 }
 
-SDB_API int sdb_ns_set (Sdb *s, const char *name, Sdb *r) {
+SDB_API bool sdb_ns_set(Sdb *s, const char *name, Sdb *r) {
 	SdbNs *ns;
 	SdbListIter *it;
 	ut32 hash = sdb_hash (name);
 	if (!s || !r || !name) {
-		return 0;
+		return false;
 	}
 	ls_foreach (s->ns, it, ns) {
 		if (ns->hash == hash) {
 			if (ns->sdb == r) {
-				return 0;
+				return false;
 			}
 			sdb_free (ns->sdb);
 			r->refs++; // sdb_ref / sdb_unref //
 			ns->sdb = r;
-			return 1;
+			return true;
 		}
 	}
 	if (s->ns_lock) {
-		return 0;
+		return false;
 	}
 	ns = R_NEW (SdbNs);
 	ns->name = strdup (name);
@@ -171,7 +172,7 @@ SDB_API int sdb_ns_set (Sdb *s, const char *name, Sdb *r) {
 	ns->sdb = r;
 	r->refs++;
 	ls_append (s->ns, ns);
-	return 1;
+	return true;
 }
 
 SDB_API Sdb *sdb_ns(Sdb *s, const char *name, int create) {
@@ -205,8 +206,9 @@ SDB_API Sdb *sdb_ns_path(Sdb *s, const char *path, int create) {
 	char *ptr, *str;
 	char *slash;
 
-	if (!s || !path || !*path)
+	if (!s || !path || !*path) {
 		return s;
+	}
 	ptr = str = strdup (path);
 	do {
 		slash = strchr (ptr, '/');
@@ -221,7 +223,7 @@ SDB_API Sdb *sdb_ns_path(Sdb *s, const char *path, int create) {
 	return s;
 }
 
-static void ns_sync (Sdb *s, SdbList *list) {
+static void ns_sync(Sdb *s, SdbList *list) {
 	SdbNs *ns;
 	SdbListIter *it;
 	ls_foreach (s->ns, it, ns) {
@@ -235,7 +237,7 @@ static void ns_sync (Sdb *s, SdbList *list) {
 	sdb_sync (s);
 }
 
-SDB_API void sdb_ns_sync (Sdb *s) {
+SDB_API void sdb_ns_sync(Sdb *s) {
 	SdbList *list = ls_new ();
 	ns_sync (s, list);
 	list->free = NULL;

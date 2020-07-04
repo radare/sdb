@@ -1,4 +1,4 @@
-/* sdb - MIT - Copyright 2012-2016 - pancake */
+/* sdb - MIT - Copyright 2012-2020 - pancake */
 
 #include <stdarg.h>
 #include "sdb.h"
@@ -19,7 +19,7 @@ SDB_API bool sdb_json_get_bool(const char *json, const char *path) {
 	return (rangstr_length (&rs) == 4 && !strncmp (p, "true", 4));
 }
 
-SDB_API char *sdb_json_get(Sdb *s, const char *k, const char *p, ut32 *cas) {
+SDB_API char *sdb_json_get(Sdb *s, const char *k, const char *p, SdbCas *cas) {
 	Rangstr rs;
 	char *u, *v = sdb_get (s, k, cas);
 	if (!v) {
@@ -31,27 +31,27 @@ SDB_API char *sdb_json_get(Sdb *s, const char *k, const char *p, ut32 *cas) {
 	return u;
 }
 
-SDB_API int sdb_json_num_inc(Sdb *s, const char *k, const char *p, int n, ut32 cas) {
+SDB_API int sdb_json_num_inc(Sdb *s, const char *k, const char *p, int n, SdbCas *cas) {
 	ut32 c;
 	int cur = sdb_json_num_get (s, k, p, &c);
-	if (cas && c != cas) {
+	if (cas && c != *cas) {
 		return 0;
 	}
 	sdb_json_num_set (s, k, p, cur + n, cas);
 	return cur + n;
 }
 
-SDB_API int sdb_json_num_dec(Sdb *s, const char *k, const char *p, int n, ut32 cas) {
+SDB_API int sdb_json_num_dec(Sdb *s, const char *k, const char *p, int n, SdbCas *cas) {
 	ut32 c;
 	int cur = sdb_json_num_get (s, k, p, &c);
-	if (cas && c != cas) {
+	if (cas && c != *cas) {
 		return 0;
 	}
 	sdb_json_num_set (s, k, p, cur - n, cas);
 	return cur - n;
 }
 
-SDB_API int sdb_json_num_get (Sdb *s, const char *k, const char *p, ut32 *cas) {
+SDB_API int sdb_json_num_get(Sdb *s, const char *k, const char *p, SdbCas *cas) {
 	char *v = sdb_get (s, k, cas);
 	if (v) {
 		Rangstr rs = json_get (v, p);
@@ -94,18 +94,18 @@ static bool isstring(const char *s) {
 }
 
 // JSON only supports base16 numbers
-SDB_API int sdb_json_num_set (Sdb *s, const char *k, const char *p, int v, ut32 cas) {
+SDB_API bool sdb_json_num_set(Sdb *s, const char *k, const char *p, int v, SdbCas *cas) {
 	char *_str, str[64];
 	_str = sdb_itoa (v, str, 10);
 	return sdb_json_set (s, k, p, _str, cas);
 }
 
-SDB_API int sdb_json_unset (Sdb *s, const char *k, const char *p, ut32 cas) {
+SDB_API bool sdb_json_unset(Sdb *s, const char *k, const char *p, SdbCas *cas) {
 	return sdb_json_set (s, k, p, NULL, cas);
 }
 
-SDB_API bool sdb_json_set (Sdb *s, const char *k, const char *p, const char *v, ut32 cas) {
-	int l, idx, len[3], jslen = 0;
+SDB_API bool sdb_json_set(Sdb *s, const char *k, const char *p, const char *v, SdbCas *cas) {
+	int l, idx, len[3];
 	char *b, *str = NULL;
 	const char *beg[3];
 	const char *end[3];
@@ -116,6 +116,7 @@ SDB_API bool sdb_json_set (Sdb *s, const char *k, const char *p, const char *v, 
 	if (!s || !k || !v) {
 		return false;
 	}
+	size_t jslen;
 	js = sdb_const_get_len (s, k, &jslen, &c);
 	if (!js) {
 		const int v_len = strlen (v);
@@ -137,7 +138,7 @@ SDB_API bool sdb_json_set (Sdb *s, const char *k, const char *p, const char *v, 
 		return false;
 	}
 	jslen++;
-	if (cas && c != cas) {
+	if (cas && c != *cas) {
 		return false;
 	}
 	rs = json_get (js, p);

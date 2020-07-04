@@ -261,12 +261,12 @@ SDB_API void *ls_pop(SdbList *list) {
 }
 
 
-SDB_API int ls_join(SdbList *list1, SdbList *list2) {
+SDB_API bool ls_join(SdbList *list1, SdbList *list2) {
 	if (!list1 || !list2) {
-		return 0;
+		return false;
 	}
 	if (!(list2->length)) {
-		return 0;
+		return false;
 	}
 	if (!(list1->length)) {
 		list1->head = list2->head;
@@ -280,7 +280,7 @@ SDB_API int ls_join(SdbList *list1, SdbList *list2) {
 	list1->length += list2->length;
 	list2->head = list2->tail = NULL;
 	list1->sorted = false;
-	return 1;
+	return true;
 }
 
 
@@ -336,13 +336,13 @@ SDB_API void *ls_pop_head(SdbList *list) {
 }
 
 
-SDB_API int ls_del_n(SdbList *list, int n) {
+SDB_API bool ls_del_n(SdbList *list, size_t n) {
 	SdbListIter *it;
-	int i;
+	size_t i;
 	if (!list) {
 		return false;
 	}
-	for (it = list->head, i = 0; it && it->data; it = it->n, i++)
+	for (it = list->head, i = 0; it && it->data; it = it->n, i++) {
 		if (i == n) {
 			if (!it->p && !it->n) {
 				list->head = list->tail = NULL;
@@ -360,5 +360,6 @@ SDB_API int ls_del_n(SdbList *list, int n) {
 			list->length--;
 			return true;
 		}
+	}
 	return false;
 }

@@ -855,14 +855,14 @@ SDB_API int sdb_query (Sdb *s, const char *cmd) {
 	return must_save;
 }
 
-SDB_API int sdb_query_lines (Sdb *s, const char *cmd) {
+SDB_API bool sdb_query_lines(Sdb *s, const char *cmd) {
 	char *o, *p, *op;
 	if (!s || !cmd) {
-		return 0;
+		return false;
 	}
 	op = strdup (cmd);
 	if (!op) {
-		return 0;
+		return false;
 	}
 	p = op;
 	do {
@@ -876,7 +876,7 @@ SDB_API int sdb_query_lines (Sdb *s, const char *cmd) {
 		}
 	} while (o);
 	free (op);
-	return 1;
+	return true;
 }
 
 static char *slurp(const char *file) {

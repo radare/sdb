@@ -1,13 +1,18 @@
 #include <sdb.h>
+#include <assert.h>
 
 int main(int argc, char **argv) {
-	int r, rc = 0;
-	ut32 cas;
+	int rc = 0;
+	SdbCas r;
+	SdbCas cas = 1;
 
 	Sdb *s = sdb_new (NULL, NULL, 0);
-	r = sdb_set (s, "hello", "world", 1);
+	assert (s != NULL);
+	r = cas;
+	assert (sdb_set (s, "hello", "world", &cas) == true);
+	r = cas;
 	sdb_const_get (s, "hello", &cas);
-	printf ("[test] r%d = c%u\n", r, cas);
+	printf ("[test] r%zu = c%zu\n", r, cas);
 	if (r != cas) {
 		printf ("error\n");
 		rc = 1;
@@ -15,16 +20,18 @@ int main(int argc, char **argv) {
 		printf ("  ok\n");
 	}
 
-	r = sdb_set (s, "hello", "world", r);
+	if (!sdb_set (s, "hello", "world", &cas)) {
+		eprintf ("Cannot set\n");
+	}
 	sdb_const_get (s, "hello", &cas);
-	printf ("[test] r%d = c%u\n", r, cas);
+	printf ("[test] r%zu = c%zu\n", r, cas);
 	if (r != cas) {
 		printf ("error\n");
 		rc = 1;
 	} else {
 		printf ("  ok\n");
 	}
-	printf ("[test] r%d = c%u\n", r, cas);
+	printf ("[test] r%zu = c%zu\n", r, cas);
 	if (r == 0) {
 		printf ("error\n");
 		rc = 1;

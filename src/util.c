@@ -214,8 +214,8 @@ SDB_API char *sdb_aslice(char *out, int from, int to) {
 
 // TODO: find better name for it
 // TODO: optimize, because this is the main bottleneck for sdb_array_set()
-SDB_API int sdb_alen(const char *str) {
-	int len = 1;
+SDB_API size_t sdb_alen(const char *str) {
+	size_t len = 1;
 	const char *n, *p = str;
 	if (!p|| !*p) {
 		return 0;
@@ -230,8 +230,8 @@ SDB_API int sdb_alen(const char *str) {
 	return ++len;
 }
 
-SDB_API int sdb_alen_ignore_empty(const char *str) {
-	int len = 1;
+SDB_API size_t sdb_alen_ignore_empty(const char *str) {
+	size_t len = 1;
 	const char *n, *p = str;
 	if (!p || !*p) {
 		return 0;
@@ -250,7 +250,9 @@ SDB_API int sdb_alen_ignore_empty(const char *str) {
 		}
 		len++;
 	}
-	if (*p) len++;
+	if (*p) {
+		len++;
+	}
 	return len;
 }
 
@@ -288,7 +290,7 @@ SDB_API ut64 sdb_now () {
 	return 0LL;
 }
 
-SDB_API ut64 sdb_unow () {
+SDB_API ut64 sdb_unow() {
 	ut64 x = 0LL;
 #if USE_MONOTONIC_CLOCK
 	struct timespec ts;
@@ -308,7 +310,7 @@ SDB_API ut64 sdb_unow () {
 	return x;
 }
 
-SDB_API int sdb_isnum(const char *s) {
+SDB_API bool sdb_isnum(const char *s) {
 	const char vs = *s;
 	return ((vs == '-' || vs == '+') || (vs >= '0' && vs <= '9'));
 }

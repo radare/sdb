@@ -16,13 +16,10 @@ SDB_IPI void json_path_first(Rangstr *s) {
 	s->t = p? (size_t)(p - s->p): strlen (s->p);
 }
 
-SDB_IPI int json_path_next(Rangstr *s) {
+SDB_IPI bool json_path_next(Rangstr *s) {
 	int stop = '.';
-	if (!s||!s->p||!s->p[s->t]) {
-		return 0;
-	}
-	if (!s->next) {
-		return 0;
+	if (!s || !s->p || !s->p[s->t] || !s->next) {
+		return false;
 	}
 	if (s->p[s->t] == '"') {
 		s->t++;
@@ -39,12 +36,12 @@ rep:
 		s->f = ++s->t;
 	}
 	if (!s->p[s->t]) {
-		return 0;
+		return false;
 	}
 	while (s->p[s->t] != stop) {
 		if (!s->p[s->t]) {
 			s->next = 0;
-			return 1;
+			return true;
 		}
 		if (s->p[s->t] == '[') {
 			break;
@@ -58,7 +55,7 @@ rep:
 		s->f++;
 		s->t--;
 	}
-	return 1;
+	return true;
 }
 
 #if 0
@@ -168,7 +165,7 @@ beach:
 	return rangstr_null ();
 }
 
-SDB_IPI Rangstr json_get (const char *js, const char *p) {
+SDB_IPI Rangstr json_get(const char *js, const char *p) {
 	int x, n = 0;
 	size_t rst;
 	Rangstr rj2, rj = rangstr_new (js);

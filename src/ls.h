@@ -67,8 +67,8 @@ SDB_API void *ls_get_top(SdbList *list);
 SDB_API void *ls_pop(SdbList *list);
 SDB_API void ls_reverse(SdbList *list);
 SDB_API SdbList *ls_clone(SdbList *list);
-SDB_API int ls_join(SdbList *first, SdbList *second);
-SDB_API int ls_del_n(SdbList *list, int n);
+SDB_API bool ls_join(SdbList *first, SdbList *second);
+SDB_API bool ls_del_n(SdbList *list, size_t n);
 SDB_API SdbListIter *ls_insert(SdbList *list, int n, void *data);
 SDB_API void *ls_pop_head(SdbList *list);
 

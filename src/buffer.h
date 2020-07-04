@@ -7,8 +7,8 @@ typedef int (*BufferOp)(int, const char *, int);
 
 typedef struct buffer {
 	char *x;
-	unsigned int p;
-	unsigned int n;
+	size_t p;
+	size_t n;
 	int fd;
 	BufferOp op;
 } buffer;
@@ -19,10 +19,10 @@ typedef struct buffer {
 
 extern void buffer_init(buffer *,BufferOp,int,char *,unsigned int);
 
-extern int buffer_flush(buffer *);
-extern int buffer_put(buffer *,const char *,unsigned int);
-extern int buffer_putalign(buffer *,const char *,unsigned int);
-extern int buffer_putflush(buffer *,const char *,unsigned int);
+extern bool buffer_flush(buffer *);
+extern bool buffer_put(buffer *,const char *,unsigned int);
+extern bool buffer_putalign(buffer *,const char *,unsigned int);
+extern bool buffer_putflush(buffer *,const char *,unsigned int);
 
 #define buffer_PUTC(s,c) \
   ( ((s)->n != (s)->p) \
