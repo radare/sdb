@@ -1,5 +1,8 @@
 /* sdb - MIT - Copyright 2011-2020 - pancake */
 
+
+#include <signal.h>
+#include <fcntl.h>
 #include "sdb.h"
 
 #define MODE_ZERO '0'
