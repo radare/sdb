@@ -32,7 +32,7 @@ SDB_API char *sdb_json_get(Sdb *s, const char *k, const char *p, SdbCas *cas) {
 }
 
 SDB_API int sdb_json_num_inc(Sdb *s, const char *k, const char *p, int n, SdbCas *cas) {
-	ut32 c;
+	SdbCas c;
 	int cur = sdb_json_num_get (s, k, p, &c);
 	if (cas && c != *cas) {
 		return 0;
@@ -42,7 +42,7 @@ SDB_API int sdb_json_num_inc(Sdb *s, const char *k, const char *p, int n, SdbCas
 }
 
 SDB_API int sdb_json_num_dec(Sdb *s, const char *k, const char *p, int n, SdbCas *cas) {
-	ut32 c;
+	SdbCas c;
 	int cur = sdb_json_num_get (s, k, p, &c);
 	if (cas && c != *cas) {
 		return 0;
@@ -111,7 +111,7 @@ SDB_API bool sdb_json_set(Sdb *s, const char *k, const char *p, const char *v, S
 	const char *end[3];
 	const char *js;
 	Rangstr rs;
-	ut32 c;
+	SdbCas c;
 
 	if (!s || !k || !v) {
 		return false;
